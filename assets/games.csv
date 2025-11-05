@@ -1,0 +1,348 @@
+"id","title","description","html_code","file_url","deployed_url","created"
+"2384e9b6-1ab2-45be-90e8-76b3cc460ce7","Mini Minesweeper","Welcome to Mini Minesweeper, a simplified version of the classic game! Your goal is to uncover all the safe squares without triggering any mines. Click on the squares to reveal them, and use the numbers to deduce where the mines are hidden. Can you clear the board without hitting a mine?","<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Mini Minesweeper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(5, 40px);
+            grid-gap: 5px;
+        }
+        .cell {
+            width: 40px;
+            height: 40px;
+            background-color: #ddd;
+            border: 1px solid #aaa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .revealed {
+            background-color: #fff;
+            cursor: default;
+        }
+        .mine {
+            background-color: red;
+            color: white;
+        }
+        .number {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mini Minesweeper</h1>
+    <p>Click on the squares to reveal them. Avoid the mines!</p>
+    <div id=""grid""></div>
+    <script>
+        const gridElement = document.getElementById('grid');
+        const gridSize = 5;
+        const mineCount = 3;
+        let grid = [];
+
+        function createGrid() {
+            // Initialize grid with empty cells
+            for (let i = 0; i < gridSize; i++) {
+                grid[i] = [];
+                for (let j = 0; j < gridSize; j++) {
+                    grid[i][j] = 0;
+                }
+            }
+            // Place mines
+            let minesPlaced = 0;
+            while (minesPlaced < mineCount) {
+                const x = Math.floor(Math.random() * gridSize);
+                const y = Math.floor(Math.random() * gridSize);
+                if (grid[x][y] !== 'M') {
+                    grid[x][y] = 'M';
+                    minesPlaced++;
+                    // Increment numbers around the mine
+                    for (let dx = -1; dx <= 1; dx++) {
+                        for (let dy = -1; dy <= 1; dy++) {
+                            const nx = x + dx;
+                            const ny = y + dy;
+                            if (nx >= 0 && ny >= 0 && nx < gridSize && ny < gridSize && grid[nx][ny] !== 'M') {
+                                grid[nx][ny]++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function renderGrid() {
+            gridElement.innerHTML = '';
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.x = i;
+                    cell.dataset.y = j;
+                    cell.addEventListener('click', revealCell);
+                    gridElement.appendChild(cell);
+                }
+            }
+        }
+
+        function revealCell(event) {
+            const x = event.target.dataset.x;
+            const y = event.target.dataset.y;
+            if (grid[x][y] === 'M') {
+                event.target.classList.add('mine');
+                alert('Game Over! You hit a mine.');
+                location.reload();
+            } else {
+                event.target.classList.add('revealed');
+                if (grid[x][y] > 0) {
+                    event.target.textContent = grid[x][y];
+                    event.target.classList.add('number');
+                } else {
+                    event.target.textContent = '';
+                }
+            }
+        }
+
+        createGrid();
+        renderGrid();
+    </script>
+</body>
+</html>","2384e9b6-1ab2-45be-90e8-76b3cc460ce7\index.html","2384e9b6-1ab2-45be-90e8-76b3cc460ce7\index.html","2025-11-05 17:07:37"
+"2d5b1c36-44d9-4f30-939e-389ff1295952","Battleship Blitz","Battleship Blitz is a classic naval strategy game where players take turns guessing the locations of their opponent's hidden ships. The first player to sink all of the opponent's ships wins the game! Use your strategic thinking to outsmart your opponent and claim victory on the high seas.","<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Battleship Blitz</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f8ff; }
+        h1 { text-align: center; }
+        #game { display: flex; justify-content: center; margin-top: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(10, 40px); margin: 0 10px; }
+        .cell { width: 40px; height: 40px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .hit { background-color: red; }
+        .miss { background-color: lightgray; }
+        #message { text-align: center; margin-top: 20px; font-size: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Battleship Blitz</h1>
+    <div id=""game"">
+        <div class=""grid"" id=""playerGrid""></div>
+        <div class=""grid"" id=""computerGrid""></div>
+    </div>
+    <div id=""message"">Click a cell to make a guess!</div>
+    <script>
+        const playerGrid = document.getElementById('playerGrid');
+        const computerGrid = document.getElementById('computerGrid');
+        const message = document.getElementById('message');
+        const gridSize = 10;
+        const playerShips = [[1, 1], [3, 3], [5, 5]]; // Example ship positions
+        const computerShips = [[2, 2], [4, 4], [6, 6]]; // Example ship positions
+        let playerTurn = true;
+        let computerHits = 0;
+        let playerHits = 0;
+
+        function createGrid(grid, isPlayer) {
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    if (isPlayer) {
+                        cell.addEventListener('click', () => playerGuess(i, j));
+                    }
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        function playerGuess(row, col) {
+            if (!playerTurn) return;
+            const cell = computerGrid.children[row * gridSize + col];
+            if (cell.classList.contains('hit') || cell.classList.contains('miss')) return;
+            if (computerShips.some(ship => ship[0] === row && ship[1] === col)) {
+                cell.classList.add('hit');
+                playerHits++;
+                message.innerText = 'Hit!';
+                if (playerHits === computerShips.length) {
+                    message.innerText = 'You win!';
+                }
+            } else {
+                cell.classList.add('miss');
+                message.innerText = 'Miss!';
+            }
+            playerTurn = false;
+            computerTurn();
+        }
+
+        function computerTurn() {
+            if (playerHits === playerShips.length) return;
+            let row, col;
+            do {
+                row = Math.floor(Math.random() * gridSize);
+                col = Math.floor(Math.random() * gridSize);
+            } while (playerGrid.children[row * gridSize + col].classList.contains('hit') || playerGrid.children[row * gridSize + col].classList.contains('miss'));
+            const cell = playerGrid.children[row * gridSize + col];
+            if (playerShips.some(ship => ship[0] === row && ship[1] === col)) {
+                cell.classList.add('hit');
+                computerHits++;
+                message.innerText = 'Computer hit!';
+                if (computerHits === playerShips.length) {
+                    message.innerText = 'Computer wins!';
+                }
+            } else {
+                cell.classList.add('miss');
+                message.innerText = 'Computer missed!';
+            }
+            playerTurn = true;
+        }
+
+        createGrid(playerGrid, true);
+        createGrid(computerGrid, false);
+    </script>
+</body>
+</html>","2d5b1c36-44d9-4f30-939e-389ff1295952\index.html","2d5b1c36-44d9-4f30-939e-389ff1295952\index.html","2025-11-05 17:09:09"
+"9af813d5-713d-42e4-9a62-f4faefd16cea","Slithering Snake Challenge","Navigate your snake to collect food while avoiding the walls and your own tail. Each time you eat, the snake grows longer, making it more challenging to maneuver. Can you achieve the highest score before crashing?","<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Slithering Snake Challenge</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        canvas {
+            border: 2px solid #fff;
+        }
+        h1 {
+            position: absolute;
+            top: 20px;
+            text-align: center;
+            width: 100%;
+        }
+        #instructions {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Slithering Snake Challenge</h1>
+    <canvas id=""gameCanvas"" width=""400"" height=""400""></canvas>
+    <div id=""instructions"">
+        <p>Use arrow keys to control the snake.</p>
+        <p>Eat the food to grow and score points!</p>
+        <p>Avoid hitting the walls or yourself!</p>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const box = 20;
+        let snake = [{x: 9 * box, y: 9 * box}];
+        let direction = null;
+        let food = {
+            x: Math.floor(Math.random() * 20) * box,
+            y: Math.floor(Math.random() * 20) * box
+        };
+        let score = 0;
+
+        document.addEventListener('keydown', directionControl);
+
+        function directionControl(event) {
+            if (event.keyCode === 37 && direction !== 'RIGHT') {
+                direction = 'LEFT';
+            } else if (event.keyCode === 38 && direction !== 'DOWN') {
+                direction = 'UP';
+            } else if (event.keyCode === 39 && direction !== 'LEFT') {
+                direction = 'RIGHT';
+            } else if (event.keyCode === 40 && direction !== 'UP') {
+                direction = 'DOWN';
+            }
+        }
+
+        function collision(head, array) {
+            for (let i = 0; i < array.length; i++) {
+                if (head.x === array[i].x && head.y === array[i].y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = (i === 0) ? 'green' : 'white';
+                ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                ctx.strokeStyle = 'black';
+                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+            }
+
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food.x, food.y, box, box);
+
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            if (direction === 'LEFT') snakeX -= box;
+            if (direction === 'UP') snakeY -= box;
+            if (direction === 'RIGHT') snakeX += box;
+            if (direction === 'DOWN') snakeY += box;
+
+            if (snakeX === food.x && snakeY === food.y) {
+                score++; 
+                food = {
+                    x: Math.floor(Math.random() * 20) * box,
+                    y: Math.floor(Math.random() * 20) * box
+                };
+            } else {
+                snake.pop();
+            }
+
+            let newHead = {x: snakeX, y: snakeY};
+
+            if (snakeX < 0 || snakeY < 0 || snakeX >= canvas.width || snakeY >= canvas.height || collision(newHead, snake)) {
+                clearInterval(game);
+                alert('Game Over! Your score: ' + score);
+            }
+
+            snake.unshift(newHead);
+            ctx.fillStyle = 'white';
+            ctx.font = '20px Arial';
+            ctx.fillText('Score: ' + score, box, box);
+        }
+
+        let game = setInterval(draw, 100);
+    </script>
+</body>
+</html>","9af813d5-713d-42e4-9a62-f4faefd16cea\index.html","9af813d5-713d-42e4-9a62-f4faefd16cea\index.html","2025-11-05 17:03:04"
