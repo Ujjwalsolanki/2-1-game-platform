@@ -1,0 +1,26 @@
+# Core LangChain and LangGraph for orchestration
+langchain
+langgraph
+langchain-community
+langchain-openai
+
+# For LLM integration (using OpenAI's API)
+openai
+
+# MySQL Database Connector
+mysql-connector-python 
+
+# Utility for parsing structured data from LLMs
+pydantic 
+
+# To handle secure environment variables
+python-dotenv
+
+black
+
+# For billing agent deployment
+fastapi
+uvicorn[standard]
+
+# For testing 
+pytest
