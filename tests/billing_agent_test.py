@@ -5,8 +5,8 @@ def initiate_payment_test():
     
     billing_agent = BillingAgent()
 
-    user_id = ''
-    game_id = ''
+    user_id = '' #Get user_id from db
+    game_id = '' #Get game_id from db
     result = billing_agent.initiate_payment(user_id=user_id, game_id=game_id)
 
     assert result['status'] == "ACCESS_GRANTED" 
@@ -15,8 +15,8 @@ def get_access_status_test():
     
     billing_agent = BillingAgent()
 
-    user_id = ''
-    game_id = ''
+    user_id = '' #Get user_id from db
+    game_id = '' #Get game_id from db
     result = billing_agent.get_access_status(user_id=user_id, game_id=game_id)
 
     assert result['status'] == "ACCESS_GRANTED" 
@@ -25,7 +25,7 @@ def get_purchased_games_test():
     
     billing_agent = BillingAgent()
 
-    user_id = ''
+    user_id = '' #Get user_id from db
     result = billing_agent.get_purchased_games(user_id=user_id)
 
     assert result is not None
