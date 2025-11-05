@@ -13,7 +13,7 @@ class LLMService:
     All high-level logic (prompts, structure enforcement) is delegated to the agents.
     """
     
-    def __init__(self, model_name: str = "gpt-4o-mini", temperature: float = 0.0):
+    def __init__(self, model_name: str = "gpt-4o-mini", temperature: float = 0.3):
         # Configuration details are stored here
         self.logger = logger
         self._model_name = model_name

@@ -1,3 +1,4 @@
+import random
 import uuid
 from pathlib import Path
 from typing import Optional
@@ -37,20 +38,6 @@ class GameGeneratorAgent:
         OUTPUT_DIR.mkdir(exist_ok=True)
         self.logger.info(f"Output directory ensured at: {OUTPUT_DIR.resolve()}")
 
-    def _generate_creative_prompt(self) -> str:
-        """Uses LLM to generate a unique, creative game idea prompt for automation."""
-        # Simple instruction to get a unique idea
-        prompt_template = """Generate a single, unique, highly creative, concise one-sentence idea for a  simple 2D web game. CRITICAL: VARY THE GENRE significantly with each run. Examples of diverse genres you can choose from include: 'A physics-based puzzle where you must launch objects to hit specific targets.', 'A simple arithmetic challenge where the user guesses a secret number between 1 and 99.', or 'An arcade clicker where you defend a tiny castle against waves of colorful squares.' Do not include any explanation or extra text."""
-        
-        # Using a plain invoke for simplicity
-        self.logger.info("--- Generating a creative prompt using LLM... ---")
-        try:
-            response = self.llm_client.invoke(prompt_template)
-            return response.content.strip()
-        except Exception as e:
-            self.logger.error(f"Failed to generate prompt. Falling back to default: {e}")
-            return "A simple tower defense game using floating elemental spheres."
-
     def generate_game(self, user_prompt: Optional[str] = None) -> str:
         """
         The main function that orchestrates the generation process. If user_prompt is None,
@@ -63,11 +50,7 @@ class GameGeneratorAgent:
             The path to the generated HTML file.
         """
         # 1. Automate Prompt Generation if not provided
-        if user_prompt is None:
-            user_prompt = self._generate_creative_prompt()
-            self.logger.info(f"Using auto-generated prompt: '{user_prompt}'")
-        else:
-            self.logger.info(f"Using user-provided prompt: '{user_prompt}'")
+        GAME_CATEGORIES = ['Tic-Tac-Toe', 'Minesweeper', 'Connect Four', 'Battleship', 'Snake' , 'Breakout/Arkanoid', 'Space Shooter (Top-Down)', 'Flappy Bird Clone', 'Hangman', 'Word Scramble/Unscramble' , 'Typing Speed Test', 'Text Adventure/Interactive Fiction', 'Number Guessing Game', 'Simon Says', 'Sudoku (Basic 3x3 or 4x4)' , 'Memory Card Match', 'Rock, Paper, Scissors', 'Coin Flip/Roulette', 'Clicker/Idle Game', 'Trivia Quiz' ]
 
         # 2. Define LLM Prompt and Structure
         system_instruction = (
@@ -76,14 +59,15 @@ class GameGeneratorAgent:
             "Ensure the game is unique and visually distinct from typical templates."
             "CRITICAL: The generated game logic, especially for quizzes or ordering, MUST BE FACTUALLY AND LOGICALLY CORRECT. Verify the solution before generating the code. "
             "The 'html_code' field MUST include ALL HTML, ALL CSS (in a <style> block), and "
-            "ALL JAVASCRIPT (in a <script> block, typically before </body>). The generated file must be immediately runnable."
+            "ALL JAVASCRIPT (in a <script> block, typically before </body>). The generated file must be immediately runnable. Also Make sure to provide instruction on same html page that how to play that game "
         )
 
+        random_game_category = random.choice(GAME_CATEGORIES)
 
         prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", system_instruction),
-                ("user", f"Generate a simple game based on the following idea: {user_prompt}"),
+                ("user", f"Generate a simple game based on the following idea: {random_game_category}"),
             ]
         )
 
